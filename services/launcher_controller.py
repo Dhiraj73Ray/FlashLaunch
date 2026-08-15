@@ -1,4 +1,4 @@
-from PySide6.QtCore import QObject, QEvent
+from PySide6.QtCore import QObject, QEvent, QTimer
 from PySide6.QtWidgets import QApplication
 
 
@@ -27,6 +27,9 @@ class LauncherController(QObject):
         self.visible = False
 
     def toggle(self):
+        QTimer.singleShot(0, self._toggle)
+    
+    def _toggle(self):
         if self.visible:
             self.hide()
         else:
