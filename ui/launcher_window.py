@@ -170,18 +170,25 @@ class LauncherWindow(QWidget):
 
     def eventFilter(self, obj, event):
         if event.type() == QEvent.KeyPress:
-
+        
             # Esc works everywhere
             if event.key() == Qt.Key_Escape:
                 self.dismiss()
                 return True
-
+    
             # Ctrl+Q quits the application
             if event.key() == Qt.Key_Q and event.modifiers() & Qt.ControlModifier:
                 QApplication.quit()
                 return True
-
+    
             if obj == self.search:
+                # Down arrow enters suggestion list
+                if event.key() == Qt.Key_Down:
+                    if self.list.isVisible() and self.list.count() > 0:
+                        self.list.setFocus()
+                        self.list.setCurrentRow(0)
+                    return True
+    
                 if event.key() in (Qt.Key_Return, Qt.Key_Enter):
                     query = self.search.text().strip()
                     if query:
@@ -190,8 +197,14 @@ class LauncherWindow(QWidget):
                         )
                         self.dismiss()
                     return True
-
+    
             elif obj == self.list:
+                # Up arrow on first item returns to input box
+                if event.key() == Qt.Key_Up and self.list.currentRow() == 0:
+                    self.search.setFocus()
+                    self.search.setCursorPosition(len(self.search.text()))
+                    return True
+    
                 if event.key() in (Qt.Key_Return, Qt.Key_Enter):
                     item = self.list.currentItem()
                     if item:
@@ -200,7 +213,7 @@ class LauncherWindow(QWidget):
                         )
                         self.dismiss()
                     return True
-
+    
         return super().eventFilter(obj, event)
 
     # ---------- Mouse Dragging ----------
